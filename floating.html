@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>悬浮球</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      overflow: hidden;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    body {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 球体：靠 JS 手动拖拽，不用 -webkit-app-region，
+       因为原生拖拽区会吞掉 click 事件，导致「能拖不能点」 */
+    .ball {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 32% 26%, #6d92c8 0%, #3a5c8c 42%, #1b3557 100%);
+      box-shadow:
+        0 10px 24px rgba(15, 23, 42, 0.40),
+        0 2px 6px rgba(15, 23, 42, 0.22),
+        inset 0 1px 1px rgba(255, 255, 255, 0.45),
+        inset 0 -3px 8px rgba(0, 0, 0, 0.28);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.3, 1), box-shadow 0.16s ease;
+    }
+
+    .ball:hover {
+      transform: scale(1.06);
+      box-shadow:
+        0 14px 30px rgba(15, 23, 42, 0.45),
+        0 3px 8px rgba(15, 23, 42, 0.25),
+        inset 0 1px 1px rgba(255, 255, 255, 0.50),
+        inset 0 -3px 8px rgba(0, 0, 0, 0.28);
+    }
+
+    /* 拖动中：取消过渡，否则球会「追」鼠标，手感发飘 */
+    .ball.dragging {
+      cursor: grabbing;
+      transform: scale(0.97);
+      transition: none;
+    }
+
+    /* 左上高光，让球看起来是立体的 */
+    .ball::after {
+      content: '';
+      position: absolute;
+      top: 9px;
+      left: 15px;
+      width: 26px;
+      height: 13px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.30);
+      filter: blur(3px);
+      transform: rotate(-20deg);
+      pointer-events: none;
+    }
+
+    /* 图标不能被鼠标事件命中，否则会挡住球的 mousedown */
+    .ball svg {
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="ball" id="ball" title="拖动移动 · 单击开关主窗口">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+      <rect x="4" y="5" width="16" height="14" rx="2.5" stroke="#ffffff" stroke-width="1.8"/>
+      <path d="M4 9.5h16" stroke="#ffffff" stroke-width="1.8"/>
+    </svg>
+  </div>
+
+  <script>
+    const ball = document.getElementById('ball')
+
+    let dragging = false
+    let moved = false          // 用来区分「拖动」和「单击」
+    let lastX = 0
+    let lastY = 0
+
+    ball.addEventListener('mousedown', (e) => {
+      dragging = true
+      moved = false
+      lastX = e.screenX || 0
+      lastY = e.screenY || 0
+      ball.classList.add('dragging')
+      e.preventDefault()
+    })
+
+    window.addEventListener('mousemove', (e) => {
+      if (!dragging) return
+
+      const dx = (e.screenX || 0) - lastX
+      const dy = (e.screenY || 0) - lastY
+
+      // 位移超过 3px 才算拖动，避免手抖把单击误判成拖动
+      if (!moved && Math.abs(dx) + Math.abs(dy) > 3) moved = true
+
+      if (moved) {
+        window.api.moveWindow(dx, dy)
+        lastX = e.screenX || 0
+        lastY = e.screenY || 0
+      }
+    })
+
+    window.addEventListener('mouseup', () => {
+      if (!dragging) return
+      ball.classList.remove('dragging')
+      // 没移动过 = 单击
+      if (!moved) window.api.toggleMain()
+      dragging = false
+    })
+  </script>
+</body>
+</html>

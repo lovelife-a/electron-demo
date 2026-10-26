@@ -1,0 +1,45 @@
+{
+  "name": "electron-demo",
+  "version": "1.0.0",
+  "description": "Electron 示例：主进程 / 渲染进程 / preload / IPC / 托盘 / 全局快捷键 / 透明悬浮窗 / 自动化测试 / 打包",
+  "main": "main.js",
+  "author": "陆炜亮",
+  "scripts": {
+    "start": "electron .",
+    "test": "playwright test",
+    "test:report": "playwright test --reporter=html",
+    "dist": "electron-builder --win portable",
+    "dist:dir": "electron-builder --win --dir"
+  },
+  "devDependencies": {
+    "@playwright/test": "latest",
+    "electron": "latest",
+    "electron-builder": "latest"
+  },
+  "build": {
+    "appId": "com.taffy.electrondemo",
+    "productName": "ElectronDemo",
+    "artifactName": "${productName}-${version}-${arch}.${ext}",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "floating.html",
+      "assets/**/*"
+    ],
+    "asar": true,
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ]
+    }
+  }
+}
