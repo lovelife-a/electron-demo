@@ -1,5 +1,7 @@
 # ElectronDemo
 
+[![E2E](https://github.com/lovelife-a/electron-demo/actions/workflows/e2e.yml/badge.svg)](https://github.com/lovelife-a/electron-demo/actions/workflows/e2e.yml)
+
 用 Electron 写的 Windows 桌面小工具，演示**多窗口架构 + 托盘常驻 + 全局快捷键 + 透明置顶悬浮球**，并自带 Playwright 端到端测试与 electron-builder 一键打包。
 
 不依赖本地已有环境，克隆下来两条命令就能跑；打包产物是单个 exe，可直接分发。
